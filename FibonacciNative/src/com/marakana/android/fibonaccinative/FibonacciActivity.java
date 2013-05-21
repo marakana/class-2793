@@ -33,12 +33,18 @@ public class FibonacciActivity extends Activity implements OnClickListener {
             long result = 0;
             long t = SystemClock.uptimeMillis();
             switch (method) {
-            case R.id.type_fib_jr:
-                result = FibLib.fibJR(n);
-                break;
-            case R.id.type_fib_ji:
-                result = FibLib.fibJI(n);
-                break;
+                case R.id.type_fib_jr:
+                    result = FibLib.fibJR(n);
+                    break;
+                case R.id.type_fib_ji:
+                    result = FibLib.fibJI(n);
+                    break;
+                case R.id.type_fib_nr:
+                    result = FibLib.fibNR(n);
+                    break;
+                case R.id.type_fib_ni:
+                    result = FibLib.fibNI(n);
+                    break;
             }
             t = SystemClock.uptimeMillis() - t;
             return String.format("fib(%d)=%d in %d ms", n, result, t);
@@ -52,28 +58,28 @@ public class FibonacciActivity extends Activity implements OnClickListener {
         }
     }
 
-	private EditText input;
-	private RadioGroup type;
-	private TextView output;
-	ProgressDialog dialog;
+    private EditText input;
+    private RadioGroup type;
+    private TextView output;
+    ProgressDialog dialog;
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.main);
-		this.input = (EditText) super.findViewById(R.id.input);
-		this.type = (RadioGroup) super.findViewById(R.id.type);
-		this.output = (TextView) super.findViewById(R.id.output);
-		Button button = (Button) super.findViewById(R.id.button);
-		button.setOnClickListener(this);
-	}
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);
+        this.input = (EditText) super.findViewById(R.id.input);
+        this.type = (RadioGroup) super.findViewById(R.id.type);
+        this.output = (TextView) super.findViewById(R.id.output);
+        Button button = (Button) super.findViewById(R.id.button);
+        button.setOnClickListener(this);
+    }
 
-	public void onClick(View view) {
-		String s = this.input.getText().toString();
-		if (TextUtils.isEmpty(s)) { return; }
+    public void onClick(View view) {
+        String s = this.input.getText().toString();
+        if (TextUtils.isEmpty(s)) { return; }
 
-		dialog = ProgressDialog.show(this, "", "Calculating...", true);
-		AsyncTask<Long, Void, String> task = new FibTask(this);
-		task.execute(Long.getLong(s));
-	}
+        dialog = ProgressDialog.show(this, "", "Calculating...", true);
+        AsyncTask<Long, Void, String> task = new FibTask(this);
+        task.execute(Long.valueOf(s));
+    }
 }
