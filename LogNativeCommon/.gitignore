@@ -1,0 +1,10 @@
+.checkstyle
+.classpath
+.project
+.settings
+/bin
+/gen
+/obj
+/libs
+lint.xml
+project.properties
