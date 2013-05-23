@@ -2,15 +2,18 @@ package com.marakana.android.lognativeservice;
 
 
 import android.os.RemoteException;
+import android.util.Log;
 
 import com.marakana.android.lognative.LogLib;
 import com.marakana.android.lognativecommon.ILogNativeService;
 import com.marakana.android.lognativecommon.LogRequest;
 
 public class ILogNativeServiceImpl extends ILogNativeService.Stub {
+    private static final String TAG = "SVCIMPL";
 
     @Override
     public void log(LogRequest req) throws RemoteException {
+        Log.d(TAG, "logging...");
         switch (req.getType()) {
             case LOG_JAVA:
                 logJ(req.getLevel(), req.getTag(), req.getMessage());

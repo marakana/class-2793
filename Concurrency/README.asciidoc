@@ -1,0 +1,45 @@
+= About This code
+
+Concurrency is an important issue, in Android.
+This repository contains four separate projects,
+each of which shows one way of managing concurrent tasks.
+
+== Setup
+
+Each of the projects has the two meta-data files necessary to create an Eclipse project,
+in the directory: $PROJ/tools/ide/eclipse.  You can create an Eclipse project from a *nix
+command line, like this:
+
+----
+> cd $PROJ
+> cp tools/ide/eclipse/project .project
+> cp tools/ide/eclipse/classpath .classpath
+----
+
+Note that the file names do not have initial periods ('.') in the tools directory,
+but require them, in the root directory, to be recognized by Eclipse
+
+== Projects
+
+=== Naive
+
+This example simple presents the problem: making a request of a network service.
+
+It is naive and broken.
+
+=== AsyncTask
+
+This example demonstrates the use of an AsyncTask to move the network request to a non-UI thread.
+ 
+=== Unbound Service
+
+This example demonstrates the use of an IntentService as a way of managing asynchronous tasks.
+ 
+=== Bound Service
+
+This example demonstrates a bound Looper/Handler as a way of managing asynchronous tasks.
+== Legal
+
+Please see ++NOTICE++ file in this directory for copyright, license terms, and legal disclaimers.
+
+Copyright © 2012 Marakana Inc.

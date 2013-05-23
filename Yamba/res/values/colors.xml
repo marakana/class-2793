@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="fog">#66bbbbbb</color>
+    <color name="dk_grey">#ee333333</color>
+    <color name="mid_green">#dd005500</color>
+    <color name="bright_green">#dd009900</color>
+</resources>
