@@ -24,6 +24,7 @@ public class YambaProvider extends ContentProvider {
 
     private static final int TIMELINE_DIR = 1;
     private static final int TIMELINE_ITEM = 2;
+    private static final int POST_DIR = 3;
 
     private static final UriMatcher uriMatcher;
     static {
@@ -36,8 +37,11 @@ public class YambaProvider extends ContentProvider {
                 YambaContract.AUTHORITY,
                 YambaContract.Timeline.TABLE + "/#",
                 TIMELINE_ITEM);
+        uriMatcher.addURI(
+                YambaContract.AUTHORITY,
+                YambaContract.Posts.TABLE,
+                POST_DIR);
     }
-
 
     private static final ProjectionMap PROJ_MAP_TIMELINE = new ProjectionMap.Builder()
         .addColumn(YambaContract.Timeline.Columns.ID, YambaHelper.COL_ID)
@@ -47,12 +51,11 @@ public class YambaProvider extends ContentProvider {
         .addColumn(YambaContract.Timeline.Columns.MAX_TIMESTAMP, "max(" + YambaHelper.COL_TIMESTAMP + ")")
         .build();
 
-
     private static final ColumnMap COL_MAP_TIMELINE = new ColumnMap.Builder()
         .addColumn(
                 YambaContract.Timeline.Columns.ID,
                 YambaHelper.COL_ID,
-                ColumnMap.Type.STRING)
+                ColumnMap.Type.LONG)
         .addColumn(
                 YambaContract.Timeline.Columns.TIMESTAMP,
                 YambaHelper.COL_TIMESTAMP,
@@ -63,6 +66,21 @@ public class YambaProvider extends ContentProvider {
                 ColumnMap.Type.STRING)
         .addColumn(
                 YambaContract.Timeline.Columns.STATUS,
+                YambaHelper.COL_STATUS,
+                ColumnMap.Type.STRING)
+        .build();
+
+    private static final ColumnMap COL_MAP_POSTS = new ColumnMap.Builder()
+        .addColumn(
+                YambaContract.Posts.Columns.XACT,
+                YambaHelper.COL_XACT,
+                ColumnMap.Type.STRING)
+        .addColumn(
+                YambaContract.Posts.Columns.TIMESTAMP,
+                YambaHelper.COL_TIMESTAMP,
+                ColumnMap.Type.LONG)
+        .addColumn(
+                YambaContract.Posts.Columns.STATUS,
                 YambaHelper.COL_STATUS,
                 ColumnMap.Type.STRING)
         .build();
@@ -83,6 +101,8 @@ public class YambaProvider extends ContentProvider {
                 return YambaContract.Timeline.ITEM_TYPE;
             case TIMELINE_DIR:
                 return YambaContract.Timeline.DIR_TYPE;
+            case POST_DIR:
+                return YambaContract.Posts.DIR_TYPE;
             default:
                 return null;
         }
@@ -130,7 +150,28 @@ public class YambaProvider extends ContentProvider {
 
     @Override
     public Uri insert(Uri uri, ContentValues vals) {
-        throw new UnsupportedOperationException("Unsupported operation: insert");
+        if (BuildConfig.DEBUG) { Log.d(TAG, "insert: " + uri); }
+        switch (uriMatcher.match(uri)) {
+            case POST_DIR:
+                break;
+
+            default:
+                throw new IllegalArgumentException("URI unsupported in insert: " + uri);
+        }
+
+        String xact = YambaService.post(getContext(), vals.getAsString(YambaContract.Posts.Columns.STATUS));
+        vals.put(YambaContract.Posts.Columns.XACT, xact);
+
+        vals = COL_MAP_POSTS.translateCols(vals);
+
+        long pk = getDb().insertOrThrow(YambaHelper.TABLE_POSTS, null, vals);
+        if (0 >= pk) { return null; }
+
+        uri = uri.buildUpon().appendPath(String.valueOf(pk)).build();
+
+        getContext().getContentResolver().notifyChange(uri, null);
+
+        return uri;
     }
 
     @Override
@@ -170,7 +211,21 @@ public class YambaProvider extends ContentProvider {
 
     @Override
     public int update(Uri uri, ContentValues vals, String where, String[] whereArgs) {
-        throw new UnsupportedOperationException("Unsupported operation: update");
+        if (BuildConfig.DEBUG) { Log.d(TAG, "update: " + uri); }
+        switch (uriMatcher.match(uri)) {
+            case POST_DIR:
+                break;
+
+            default:
+                throw new IllegalArgumentException("URI unsupported in update: " + uri);
+        }
+
+        vals = COL_MAP_POSTS.translateCols(vals);
+        int n = getDb().update(YambaHelper.TABLE_POSTS, vals, where, whereArgs);
+
+        if (0 < n) { getContext().getContentResolver().notifyChange(uri, null); }
+
+        return n;
     }
 
     @Override

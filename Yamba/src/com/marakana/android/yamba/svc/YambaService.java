@@ -2,6 +2,7 @@ package com.marakana.android.yamba.svc;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import android.app.AlarmManager;
 import android.app.IntentService;
@@ -33,14 +34,18 @@ public class YambaService extends IntentService {
     private static final int OP_POST = 6004;
 
     private static final String SVC_PARAM_STATUS = "YambaService.STATUS";
+    private static final String SVC_PARAM_XACT = "YambaService.XACT";
 
     private static final int INTENT_TAG = 42;
 
-    public static void post(Context ctxt, String status) {
+    public static String post(Context ctxt, String status) {
+        String xactId = UUID.randomUUID().toString();
         Intent intent = new Intent(ctxt, YambaService.class);
         intent.putExtra(SVC_PARAM_OP, OP_POST);
         intent.putExtra(SVC_PARAM_STATUS, status);
+        intent.putExtra(SVC_PARAM_XACT, xactId);
         ctxt.startService(intent);
+        return xactId;
     }
 
     public static void startPolling(Context ctxt) {
@@ -67,7 +72,7 @@ public class YambaService extends IntentService {
 
         switch (op) {
             case OP_POST:
-                postStatus(args);
+                postStatus(args.getString(SVC_PARAM_STATUS), args.getString(SVC_PARAM_XACT));
                 break;
 
             case OP_START_POLLING:
@@ -87,14 +92,18 @@ public class YambaService extends IntentService {
         }
     }
 
-    void postStatus(Bundle args) {
+    void postStatus(String status, String xact) {
+        ContentValues vals = new ContentValues();
         try {
-            String status = args.getString(SVC_PARAM_STATUS);
             ((YambaApplication) getApplication()).getClient().postStatus(status);
             if (BuildConfig.DEBUG) { Log.d(TAG, "Posted: " + status); }
+            vals.put(YambaContract.Posts.Columns.TIMESTAMP, Long.valueOf(System.currentTimeMillis()));
         }
         catch (YambaClientException e) {
             Log.w(TAG, "post failed: ", e);
+        }
+        finally {
+            cleanupPost(xact, vals);
         }
     }
 
@@ -176,6 +185,15 @@ public class YambaService extends IntentService {
                 null);
         try { return (c.moveToNext()) ? c.getLong(0) : Long.MIN_VALUE; }
         finally { c.close(); }
+    }
+
+    private void cleanupPost(String xact, ContentValues vals) {
+        vals.putNull(YambaContract.Posts.Columns.XACT);
+        getContentResolver().update(
+                YambaContract.Posts.URI,
+                vals,
+                YambaHelper.COL_XACT + "=?",
+                new String[] { xact });
     }
 
     private Intent getPollIntent() {

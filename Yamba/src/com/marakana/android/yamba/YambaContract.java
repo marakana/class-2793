@@ -52,4 +52,37 @@ public final class YambaContract {
             public static final String MAX_TIMESTAMP = "max_timestamp";
         }
     }
+
+    /** */
+    public static final class Posts {
+        /** Our table */
+        public static final String TABLE = "posts";
+
+        /** Our base URI */
+        public static final Uri URI = BASE_URI.buildUpon().appendPath(TABLE).build();
+
+        /** MIME sub-type for posts content */
+        public static final String MIME_SUBTYPE = "/vnd.com.marakana.yamba.posts";
+        /** Posts table DIR type */
+        public static final String DIR_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE + MIME_SUBTYPE;
+        /** Posts table ITEM type */
+        public static final String ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE + MIME_SUBTYPE;
+
+        /**
+         * Column definitions for status information.
+         */
+        public final static class Columns {
+            // Prevent instantiation
+            private Columns() {}
+
+            /** Required by ListView */
+            public static final String ID = BaseColumns._ID;
+            /** Actual post time */
+            public static final String TIMESTAMP = "timestamp";
+            /** Id of transaction currently attempting to send this messae */
+            public static final String XACT = "xact";
+            /** Message */
+            public static final String STATUS = "status";
+        }
+    }
 }

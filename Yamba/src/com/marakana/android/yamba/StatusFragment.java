@@ -1,9 +1,11 @@
 package com.marakana.android.yamba;
 
-import com.marakana.android.yamba.svc.YambaService;
 
 import android.app.Fragment;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -26,6 +28,21 @@ public class StatusFragment extends Fragment {
 
     private TextView textCount;
     private EditText editText;
+
+    static class Poster extends AsyncTask<String, Void, Void> {
+        private final ContentResolver cr;
+
+        public Poster(ContentResolver cr) { this.cr = cr; }
+
+        @Override
+        protected Void doInBackground(String... args) {
+            ContentValues values = new ContentValues();
+            values.put(YambaContract.Posts.Columns.STATUS, args[0]);
+            cr.insert(YambaContract.Posts.URI, values);
+            return null;
+        }
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle state) {
@@ -60,7 +77,8 @@ public class StatusFragment extends Fragment {
         if (TextUtils.isEmpty(msg)) { return; }
 
         editText.setText("");
-        YambaService.post(getActivity(), msg);
+
+        new Poster(getActivity().getApplicationContext().getContentResolver()).execute(msg);
     }
 
     void updateStatusLen() {
