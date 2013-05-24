@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- App -->
+    <string name="app_name">TagView</string>
+
+    <!-- Menu -->
+    <string name="menu_tags">Tags</string>
+    <string name="menu_one">One</string>
+    <string name="menu_two">Two</string>
+
+    <!-- Tags -->
+    <string name="header">Tags view</string>
+
+    <!-- One, Two -->
+    <string name="title_activity_one">ActivityOne</string>
+    <string name="title_activity_two">ActivityTwo</string>
+    <string name="hello_world">Hello world!</string>
+
+</resources>
